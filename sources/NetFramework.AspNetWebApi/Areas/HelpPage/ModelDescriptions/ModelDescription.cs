@@ -1,6 +1,6 @@
 using System;
 
-namespace WebApplication2.Areas.HelpPage.ModelDescriptions
+namespace NetFramework.AspNetWebApi.Areas.HelpPage.ModelDescriptions
 {
     /// <summary>
     /// Describes a type model.

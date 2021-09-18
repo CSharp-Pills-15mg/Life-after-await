@@ -5,13 +5,13 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using System.Web.Http;
-using WebApplication2.Areas.HelpPage.SampleGeneration;
+using NetFramework.AspNetWebApi.Areas.HelpPage.SampleGeneration;
 
 #if Handle_PageResultOfT
 using System.Web.Http.OData;
 #endif
 
-namespace WebApplication2.Areas.HelpPage.App_Start
+namespace NetFramework.AspNetWebApi.Areas.HelpPage.App_Start
 {
     /// <summary>
     /// Use this class to customize the Help Page.

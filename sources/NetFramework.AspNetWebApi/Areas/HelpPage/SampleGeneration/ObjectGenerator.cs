@@ -6,7 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
-namespace WebApplication2.Areas.HelpPage.SampleGeneration
+namespace NetFramework.AspNetWebApi.Areas.HelpPage.SampleGeneration
 {
     /// <summary>
     /// This class will create an object of a given type and populate it with sample data.

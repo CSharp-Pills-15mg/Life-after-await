@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 
-namespace WebApplication2.Controllers
+namespace NetFramework.AspNetWebApi.Controllers
 {
     public class ValuesController : ApiController
     {

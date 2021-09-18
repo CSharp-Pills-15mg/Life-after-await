@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace ConsoleApplication.NetFramework
+namespace NetFramework.ConsoleApplication
 {
     internal class Program
     {

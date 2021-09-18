@@ -13,7 +13,7 @@ using System.Web.Http.Description;
 using System.Xml.Linq;
 using Newtonsoft.Json;
 
-namespace WebApplication2.Areas.HelpPage.SampleGeneration
+namespace NetFramework.AspNetWebApi.Areas.HelpPage.SampleGeneration
 {
     /// <summary>
     /// This class will generate the samples for the help page.

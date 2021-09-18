@@ -1,4 +1,4 @@
-namespace WebApplication2.Areas.HelpPage.SampleGeneration
+namespace NetFramework.AspNetWebApi.Areas.HelpPage.SampleGeneration
 {
     /// <summary>
     /// Indicates whether the sample is used for request or response

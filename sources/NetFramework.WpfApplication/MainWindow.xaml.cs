@@ -3,7 +3,7 @@ using System.Text;
 using System.Threading;
 using System.Windows;
 
-namespace WpfApplication.NetFramework
+namespace NetFramework.WpfApplication
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

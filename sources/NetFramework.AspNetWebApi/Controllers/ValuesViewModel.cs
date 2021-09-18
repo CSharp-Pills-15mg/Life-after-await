@@ -1,4 +1,4 @@
-﻿namespace WebApplication2.Controllers
+﻿namespace NetFramework.AspNetWebApi.Controllers
 {
     public class ValuesViewModel
     {

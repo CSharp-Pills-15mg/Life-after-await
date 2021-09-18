@@ -2,36 +2,22 @@
 
 ## What do I want to show?
 
-1) The type of the Synchronization Context in different types of applications:
-   - Console (Net Core)
-   - WinForms (Net Framework)
-   - WPF (Net Core)
-   - Web Application (Net Core)
-   - Web Application (Net Framework)
+### The type of the Synchronization Context in different types of applications:
 
-|                 |            NET Framework             |              NET Core              |
-| --------------- | :----------------------------------: | :--------------------------------: |
-| Console         |                `null`                |               `null`               |
-| WinForms        | `WindowsFormsSynchronizationContext` |                                    |
-| WPF             |  `DispatcherSynchronizationContext`  | `DispatcherSynchronizationContext` |
-| Web Application |    `AspNetSynchronizationContext`    |               `null`               |
+- Console (Net Core) - `null`
+- WinForms (Net Framework) - `WindowsFormsSynchronizationContext`
+- WPF (Net Core) - `DispatcherSynchronizationContext`
+- ASP.NET (Net Framework) - `AspNetSynchronizationContext`
+- ASP.NET (Net Core) - `null`
 
-2) The effect of `ConfigureAwait(false)` in different types of applications:
-   - Console (Net Core) - no effect
-   - WPF (Net Core) - different `Dispatcher` instance
-   - Web Application (Net Framework) - loose `HttpContext`
-   - Web Application (Net Core) - no effect
+### If context is NOT preserved `ConfigureAwait(false)`:
 
-|                 |    NET Framework    |               NET Core               |
-| --------------- | :-----------------: | :----------------------------------: |
-| Console         |     (no effect)     |             (no effect)              |
-| WinForms        |          ?          |                                      |
-| WPF             |          ?          | different `Dispatcher` - still works |
-| Web Application | loose `HttpContext` |             (no effect)              |
+- Console (Net Core) - no effect
+- WPF (Net Core) - different `Dispatcher` instance
+- Web Application (Net Framework) - loose `HttpContext`
+- Web Application (Net Core) - no effect
 
-## Preparation Recipe
-
-(redo)
+## Preparation Recipe (must redo)
 
 - Create a C# Console Application.
 - Create an `async` method, and `await` inside it another `async` method.

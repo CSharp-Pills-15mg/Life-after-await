@@ -4,7 +4,6 @@
 
 Frameworks (.NET)
 
-## Description
+## Question
 
-- Q: After `await`, is the code executed by the same thread?
-- A: ???
+- After `await`, is the code executed by the same thread?
