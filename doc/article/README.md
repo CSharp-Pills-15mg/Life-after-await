@@ -66,12 +66,12 @@ Stephen Cleary has a good article posted on the Microsoft's web page:
 
 ## Synchronization Context Types
 
-|          |            NET Framework             |              NET Core              |
-| -------- | :----------------------------------: | :--------------------------------: |
-| Console  |                `null`                |               `null`               |
-| WinForms | `WindowsFormsSynchronizationContext` |                                    |
-| WPF      |  `DispatcherSynchronizationContext`  | `DispatcherSynchronizationContext` |
-| ASP.NET  |    `AspNetSynchronizationContext`    |               `null`               |
+|          |            NET Framework             |               NET Core               |
+| -------- | :----------------------------------: | :----------------------------------: |
+| Console  |                `null`                |                `null`                |
+| WinForms | `WindowsFormsSynchronizationContext` | `WindowsFormsSynchronizationContext` |
+| WPF      |  `DispatcherSynchronizationContext`  |  `DispatcherSynchronizationContext`  |
+| ASP.NET  |    `AspNetSynchronizationContext`    |                `null`                |
 
 > **Note**: There is no Synchronization Context in ASP.NET Core
 >

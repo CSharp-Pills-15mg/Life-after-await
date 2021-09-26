@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 
     mc:Ignorable="d"
-    Title="MainWindow"
+    Title="WPF - Net Framework - Synchronization Context"
     Height="450"
     Width="800">
 

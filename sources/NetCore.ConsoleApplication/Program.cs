@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace NetCore.ConsoleApplication
@@ -10,27 +9,33 @@ namespace NetCore.ConsoleApplication
     {
         private static void Main()
         {
-            // Display SynchronizationContext's type
+            Job[] jobs = CreateJobs();
+            RunAllJobs(jobs);
 
-            Type synchronizationContextType = SynchronizationContext.Current?.GetType();
-            Console.WriteLine(synchronizationContextType?.FullName ?? "<null>");
+            ConsoleView consoleView = new ConsoleView();
+            consoleView.DisplayResults(jobs);
+        }
 
-            // Run multiple tasks in parallel.
+        private static Job[] CreateJobs()
+        {
+            Random random = new Random();
 
-            Task<Result>[] tasks = Enumerable.Range(1, 10000)
-                .Select(Something.DoSomething)
+            return Enumerable.Range(1, 10000)
+                .Select(x =>
+                {
+                    int millisecondsDelay = random.Next(1000);
+                    return new Job(x, millisecondsDelay);
+                })
+                .ToArray();
+        }
+
+        private static void RunAllJobs(IEnumerable<Job> jobs)
+        {
+            Task[] tasks = jobs
+                .Select(x => x.ExecuteAsync())
                 .ToArray();
 
             Task.WaitAll(tasks);
-
-            List<Result> results = tasks
-                .Select(x => x.Result)
-                .ToList();
-
-            Console.WriteLine("Count: " + results.Count);
-            Console.WriteLine("Is same synchronization context: " + results.All(x => x.IsSameSynchronizationContext));
-            Console.WriteLine("Is same thread id: " + results.All(x => x.IsSameThreadId));
-            Console.WriteLine("Is same execution context: " + results.All(x => x.IsSameContext));
         }
     }
 }

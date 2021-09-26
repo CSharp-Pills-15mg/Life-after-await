@@ -1,29 +1,25 @@
 ﻿using System;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
+using System.Windows.Forms;
 
-namespace NetFramework.WpfApplication
+namespace NetCore.WinForms
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+    public partial class Form1 : Form
     {
-        public MainWindow()
+        public Form1()
         {
             InitializeComponent();
         }
 
-        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        private void buttonRun_Click(object sender, EventArgs e)
         {
             _ = Execute();
         }
 
         private async Task Execute()
         {
-            TextBoxResults.Text = "Running ...";
+            textBoxResults.Text = "Running ...";
 
             Job job = new Job(1, 1000);
 
@@ -34,7 +30,7 @@ namespace NetFramework.WpfApplication
 
             try
             {
-                TextBoxResults.Text = SerializeResults(job);
+                textBoxResults.Text = SerializeResults(job);
             }
             catch (Exception ex)
             {
@@ -74,10 +70,12 @@ namespace NetFramework.WpfApplication
 
         private void DisplayResult(string result)
         {
-            Dispatcher.Invoke(() =>
-            {
-                TextBoxResults.Text = result;
-            });
+            if (InvokeRequired)
+                Invoke(new DisplayResultDelegate(DisplayResult), result);
+            else
+                textBoxResults.Text = result;
         }
+
+        private delegate void DisplayResultDelegate(string result);
     }
 }
