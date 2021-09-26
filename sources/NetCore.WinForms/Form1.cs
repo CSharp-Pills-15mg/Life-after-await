@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -21,29 +22,38 @@ namespace NetCore.WinForms
         {
             textBoxResults.Text = "Running ...";
 
-            Job job = new Job(1, 1000);
+            Job job = new Job();
+
+            // Before async
+            job.SynchronizationContext1 = SynchronizationContext.Current;
+            job.ExecutionContext1 = Thread.CurrentThread.ExecutionContext;
+            job.ThreadId1 = Thread.CurrentThread.ManagedThreadId;
 
             // In order to execute correctly we need to restore the context after the await.
             // - Do not call ConfigureAwait(...) method. By default the await keyword will restore the context.
             // - Or call ConfigureAwait(true) to explicitly ask to restore the context.
-            await job.ExecuteAsync().ConfigureAwait(true);
+            await Task.Delay(1000).ConfigureAwait(true);
+
+            // After async
+            job.SynchronizationContext2 = SynchronizationContext.Current;
+            job.ExecutionContext2 = Thread.CurrentThread.ExecutionContext;
+            job.ThreadId2 = Thread.CurrentThread.ManagedThreadId;
+
+            string results = SerializeResults(job);
 
             try
             {
-                textBoxResults.Text = SerializeResults(job);
+                textBoxResults.Text = results;
             }
             catch (Exception ex)
             {
-                DisplayResult(ex.ToString());
+                DisplayResult(ex + Environment.NewLine + Environment.NewLine + results);
             }
         }
 
         public string SerializeResults(Job job)
         {
             StringBuilder sb = new StringBuilder();
-
-            sb.AppendLine($"Job {job.Id}");
-            sb.AppendLine($"    - Execution time: {job.MillisecondsDelay}");
 
             string synchronizationContext1Text = job.SynchronizationContext1?.ToString() ?? "<null>";
             sb.AppendLine($"    - Synchronization context 1: {synchronizationContext1Text}");

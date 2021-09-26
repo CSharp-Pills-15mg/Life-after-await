@@ -2,55 +2,47 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
 
 namespace NetCore.AspNetCoreRazorPages.Pages
 {
     public class IndexModel : PageModel
     {
-        private readonly ILogger<IndexModel> _logger;
-
-        public string SynchronizationContextType { get; set; }
-
-        public IndexModel(ILogger<IndexModel> logger)
-        {
-            _logger = logger;
-        }
+        public string SerializedResult { get; private set; }
 
         public async Task OnGet()
         {
-            // Display SynchronizationContext's type
+            Result result = new Result();
 
-            Type synchronizationContextType = SynchronizationContext.Current?.GetType();
-            SynchronizationContextType = synchronizationContextType?.FullName ?? "<null>";
+            // Before async
+            result.SynchronizationContext1 = SynchronizationContext.Current;
+            result.ExecutionContext1 = Thread.CurrentThread.ExecutionContext;
+            result.ThreadId1 = Thread.CurrentThread.ManagedThreadId;
+            result.CultureInfo1 = Thread.CurrentThread.CurrentCulture;
+            result.UICultureInfo1 = Thread.CurrentThread.CurrentUICulture;
+            result.HttpContext1 = HttpContext;
 
-            Thread.CurrentThread.CurrentCulture = new CultureInfo("ro-RO");
-            Thread.CurrentThread.CurrentUICulture = new CultureInfo("ro-RO");
+            // In order to execute correctly we need to restore the context after the await.
+            // - Do not call ConfigureAwait(...) method. By default the await keyword will restore the context.
+            // - Or call ConfigureAwait(true) to explicitly ask to restore the context.
+            await Task.Delay(1000).ConfigureAwait(false);
 
-            CultureInfo cultureInfo1 = Thread.CurrentThread.CurrentCulture;
+            // After async
+            result.SynchronizationContext2 = SynchronizationContext.Current;
+            result.ExecutionContext2 = Thread.CurrentThread.ExecutionContext;
+            result.ThreadId2 = Thread.CurrentThread.ManagedThreadId;
+            result.CultureInfo2 = Thread.CurrentThread.CurrentCulture;
+            result.UICultureInfo2 = Thread.CurrentThread.CurrentUICulture;
+            result.HttpContext2 = HttpContext;
 
-            List<Task> tasks = Enumerable.Range(1, 100)
-                .Select(x => Task.Delay(1000))
-                .ToList();
-
-            foreach (Task task in tasks)
+            ResultViewModel resultViewModel = new ResultViewModel(result);
+            SerializedResult = JsonSerializer.Serialize(resultViewModel, new JsonSerializerOptions
             {
-                await task.ConfigureAwait(false);
-
-                CultureInfo cultureInfo2 = Thread.CurrentThread.CurrentCulture;
-
-                if (cultureInfo1.Name != cultureInfo2.Name)
-                {
-                }
-
-            }
-
-            //await Task.Delay(1000).ConfigureAwait(false);
-
-            CultureInfo cultureInfo3 = Thread.CurrentThread.CurrentCulture;
+                WriteIndented = true
+            });
         }
     }
 }

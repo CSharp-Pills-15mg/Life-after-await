@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
 using NetFramework.AspNetWebApi.Models;
 
@@ -11,66 +8,33 @@ namespace NetFramework.AspNetWebApi.Controllers
 {
     public class ValuesController : ApiController
     {
-        private CultureInfo currentCulture1;
-        private CultureInfo currentUICulture1;
-
-        private CultureInfo currentCulture2;
-        private CultureInfo currentUICulture2;
-
-        //// GET api/values
-        //public async Task<JobViewModel> Get()
-        //{
-        //    // Set culture
-
-        //    Thread.CurrentThread.CurrentCulture = new CultureInfo("ro-RO");
-        //    Thread.CurrentThread.CurrentUICulture = new CultureInfo("ro-RO");
-
-        //    Job job = new Job();
-        //    await job.ExecuteAsync();
-
-        //    return new JobViewModel(job);
-        //}
-
-        public ThreadInfoViewModel Get()
+        // GET api/values
+        public async Task<ResultViewModel> Get()
         {
-            // Set culture
+            Result result = new Result();
 
-            Thread.CurrentThread.CurrentCulture = new CultureInfo("ro-RO");
-            Thread.CurrentThread.CurrentUICulture = new CultureInfo("ro-RO");
+            // Before async
+            result.SynchronizationContext1 = SynchronizationContext.Current;
+            result.ExecutionContext1 = Thread.CurrentThread.ExecutionContext;
+            result.ThreadId1 = Thread.CurrentThread.ManagedThreadId;
+            result.CultureInfo1 = Thread.CurrentThread.CurrentCulture;
+            result.UICultureInfo1 = Thread.CurrentThread.CurrentUICulture;
+            result.HttpContext1 = HttpContext.Current;
 
-            Thread thread = new Thread(RunThread);
-            thread.IsBackground = false;
+            // In order to execute correctly we need to restore the context after the await.
+            // - Do not call ConfigureAwait(...) method. By default the await keyword will restore the context.
+            // - Or call ConfigureAwait(true) to explicitly ask to restore the context.
+            await Task.Delay(1000).ConfigureAwait(true);
 
-            currentCulture1 = Thread.CurrentThread.CurrentCulture;
-            currentUICulture1 = Thread.CurrentThread.CurrentUICulture;
+            // After async
+            result.SynchronizationContext2 = SynchronizationContext.Current;
+            result.ExecutionContext2 = Thread.CurrentThread.ExecutionContext;
+            result.ThreadId2 = Thread.CurrentThread.ManagedThreadId;
+            result.CultureInfo2 = Thread.CurrentThread.CurrentCulture;
+            result.UICultureInfo2 = Thread.CurrentThread.CurrentUICulture;
+            result.HttpContext2 = HttpContext.Current;
 
-            thread.Start();
-            thread.Join();
-
-            return new ThreadInfoViewModel
-            {
-                CurrentCulture1 = currentCulture1?.Name ?? "<null>",
-                CurrentCulture2 = currentCulture2?.Name ?? "<null>",
-                CurrentUICulture1 = currentUICulture1?.Name ?? "<null>",
-                CurrentUICulture2 = currentUICulture2?.Name ?? "<null>",
-            };
+            return new ResultViewModel(result);
         }
-
-        private void RunThread()
-        {
-            currentCulture2 = Thread.CurrentThread.CurrentCulture;
-            currentUICulture2 = Thread.CurrentThread.CurrentUICulture;
-        }
-    }
-
-    public class ThreadInfoViewModel
-    {
-        public string CurrentCulture1 { get; set; }
-        
-        public string CurrentCulture2 { get; set; }
-        
-        public string CurrentUICulture1 { get; set; }
-        
-        public string CurrentUICulture2 { get; set; }
     }
 }
