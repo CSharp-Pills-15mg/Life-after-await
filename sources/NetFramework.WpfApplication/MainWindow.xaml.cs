@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace NetFramework.WpfApplication
 {
@@ -25,49 +26,68 @@ namespace NetFramework.WpfApplication
         {
             TextBoxResults.Text = "Running ...";
 
-            Job job = new Job(1, 1000);
+            Result result = new Result();
+
+            // Before async
+            result.SynchronizationContext1 = SynchronizationContext.Current;
+            result.ExecutionContext1 = Thread.CurrentThread.ExecutionContext;
+            result.ThreadId1 = Thread.CurrentThread.ManagedThreadId;
+            result.Dispatcher1 = Dispatcher.CurrentDispatcher;
 
             // In order to execute correctly we need to restore the context after the await.
             // - Do not call ConfigureAwait(...) method. By default the await keyword will restore the context.
             // - Or call ConfigureAwait(true) to explicitly ask to restore the context.
-            await job.ExecuteAsync().ConfigureAwait(true);
+            await Task.Delay(1000).ConfigureAwait(true);
+
+            // After async
+            result.SynchronizationContext2 = SynchronizationContext.Current;
+            result.ExecutionContext2 = Thread.CurrentThread.ExecutionContext;
+            result.ThreadId2 = Thread.CurrentThread.ManagedThreadId;
+            result.Dispatcher2 = Dispatcher.CurrentDispatcher;
+
+            string serializedResult = SerializeResults(result);
 
             try
             {
-                TextBoxResults.Text = SerializeResults(job);
+                TextBoxResults.Text = serializedResult;
             }
             catch (Exception ex)
             {
-                DisplayResult(ex.ToString());
+                DisplayResult(ex + Environment.NewLine + Environment.NewLine + serializedResult);
             }
         }
 
-        public string SerializeResults(Job job)
+        public string SerializeResults(Result result)
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine($"Job {job.Id}");
-            sb.AppendLine($"    - Execution time: {job.MillisecondsDelay}");
-
-            string synchronizationContext1Text = job.SynchronizationContext1?.ToString() ?? "<null>";
+            string synchronizationContext1Text = result.SynchronizationContext1?.ToString() ?? "<null>";
             sb.AppendLine($"    - Synchronization context 1: {synchronizationContext1Text}");
 
-            string synchronizationContext2Text = job.SynchronizationContext2?.ToString() ?? "<null>";
+            string synchronizationContext2Text = result.SynchronizationContext2?.ToString() ?? "<null>";
             sb.AppendLine($"    - Synchronization context 2: {synchronizationContext2Text}");
 
-            sb.AppendLine($"    - Is same synchronization context: {job.IsSameSynchronizationContext}");
+            sb.AppendLine($"    - Is same synchronization context: {result.IsSameSynchronizationContext}");
 
-            sb.AppendLine($"    - Thread id 1: {job.ThreadId1}");
-            sb.AppendLine($"    - Thread id 2: {job.ThreadId2}");
-            sb.AppendLine($"    - Is same thread id: {job.IsSameThreadId}");
+            sb.AppendLine($"    - Thread id 1: {result.ThreadId1}");
+            sb.AppendLine($"    - Thread id 2: {result.ThreadId2}");
+            sb.AppendLine($"    - Is same thread id: {result.IsSameThreadId}");
 
-            string executionContext1Text = job.ExecutionContext1?.ToString() ?? "<null>";
+            string executionContext1Text = result.ExecutionContext1?.ToString() ?? "<null>";
             sb.AppendLine($"    - Execution context 1: {executionContext1Text}");
 
-            string executionContext2Text = job.ExecutionContext2?.ToString() ?? "<null>";
+            string executionContext2Text = result.ExecutionContext2?.ToString() ?? "<null>";
             sb.AppendLine($"    - Execution context 2: {executionContext2Text}");
 
-            sb.AppendLine($"    - Is same execution context: {job.IsSameExecutionContext}");
+            sb.AppendLine($"    - Is same execution context: {result.IsSameExecutionContext}");
+
+            string dispatcher1Text = result.Dispatcher1?.ToString() ?? "<null>";
+            sb.AppendLine($"    - Dispatcher 1: {dispatcher1Text}");
+
+            string dispatcher2Text = result.Dispatcher2?.ToString() ?? "<null>";
+            sb.AppendLine($"    - Dispatcher 2: {dispatcher2Text}");
+
+            sb.AppendLine($"    - Is same dispatcher: {result.IsSameDispatcher}");
 
             return sb.ToString();
         }

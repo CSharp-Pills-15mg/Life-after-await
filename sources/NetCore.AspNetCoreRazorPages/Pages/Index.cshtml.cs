@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -25,9 +21,11 @@ namespace NetCore.AspNetCoreRazorPages.Pages
             result.UICultureInfo1 = Thread.CurrentThread.CurrentUICulture;
             result.HttpContext1 = HttpContext;
 
-            // In order to execute correctly we need to restore the context after the await.
-            // - Do not call ConfigureAwait(...) method. By default the await keyword will restore the context.
-            // - Or call ConfigureAwait(true) to explicitly ask to restore the context.
+            // In ASP.NET Core there is no synchronization context. That means there is nothing to be restored.
+            // Even though, from a functional point of view, it doesn't matter if "ConfigureAwait(...)" is called and
+            // it doesn't matter if it is called with "true" or "false", a call to "ConfigureAwait(false)" will
+            // slightly improve the performance. By doing so, the "await" will not even try to capture and restore
+            // the nonexistent context.
             await Task.Delay(1000).ConfigureAwait(false);
 
             // After async
@@ -38,11 +36,18 @@ namespace NetCore.AspNetCoreRazorPages.Pages
             result.UICultureInfo2 = Thread.CurrentThread.CurrentUICulture;
             result.HttpContext2 = HttpContext;
 
-            ResultViewModel resultViewModel = new ResultViewModel(result);
-            SerializedResult = JsonSerializer.Serialize(resultViewModel, new JsonSerializerOptions
+            SerializedResult = SerializeResult(result);
+        }
+
+        private static string SerializeResult(Result result)
+        {
+            JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions
             {
                 WriteIndented = true
-            });
+            };
+
+            ResultViewModel resultViewModel = new ResultViewModel(result);
+            return JsonSerializer.Serialize(resultViewModel, jsonSerializerOptions);
         }
     }
 }

@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace NetCore.WpfApplication
 {
@@ -20,36 +19,85 @@ namespace NetCore.WpfApplication
 
         private async void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
+            _ = Execute();
+        }
+
+        private async Task Execute()
+        {
+            TextBoxResults.Text = "Running ...";
+
+            Result result = new Result();
+
+            // Before async
+            result.SynchronizationContext1 = SynchronizationContext.Current;
+            result.ExecutionContext1 = Thread.CurrentThread.ExecutionContext;
+            result.ThreadId1 = Thread.CurrentThread.ManagedThreadId;
+            result.Dispatcher1 = Dispatcher.CurrentDispatcher;
+
+            // In order to execute correctly we need to restore the context after the await.
+            // - Do not call ConfigureAwait(...) method. By default the await keyword will restore the context.
+            // - Or call ConfigureAwait(true) to explicitly ask to restore the context.
+            await Task.Delay(1000).ConfigureAwait(true);
+
+            // After async
+            result.SynchronizationContext2 = SynchronizationContext.Current;
+            result.ExecutionContext2 = Thread.CurrentThread.ExecutionContext;
+            result.ThreadId2 = Thread.CurrentThread.ManagedThreadId;
+            result.Dispatcher2 = Dispatcher.CurrentDispatcher;
+
+            string serializedResult = SerializeResults(result);
+
+            try
+            {
+                TextBoxResults.Text = serializedResult;
+            }
+            catch (Exception ex)
+            {
+                DisplayResult(ex + Environment.NewLine + Environment.NewLine + serializedResult);
+            }
+        }
+
+        public string SerializeResults(Result result)
+        {
             StringBuilder sb = new StringBuilder();
 
-            // Display SynchronizationContext's type
+            string synchronizationContext1Text = result.SynchronizationContext1?.ToString() ?? "<null>";
+            sb.AppendLine($"    - Synchronization context 1: {synchronizationContext1Text}");
 
-            Type synchronizationContextType = SynchronizationContext.Current?.GetType();
-            sb.AppendLine("Synchronization Context Type: " + (synchronizationContextType?.FullName ?? " < null>"));
+            string synchronizationContext2Text = result.SynchronizationContext2?.ToString() ?? "<null>";
+            sb.AppendLine($"    - Synchronization context 2: {synchronizationContext2Text}");
 
-            //await Task.Delay(1000).ConfigureAwait(true);
+            sb.AppendLine($"    - Is same synchronization context: {result.IsSameSynchronizationContext}");
 
-            //TextBoxResults.Text = "asd";
+            sb.AppendLine($"    - Thread id 1: {result.ThreadId1}");
+            sb.AppendLine($"    - Thread id 2: {result.ThreadId2}");
+            sb.AppendLine($"    - Is same thread id: {result.IsSameThreadId}");
 
-            Task<Result>[] tasks = Enumerable.Range(1, 100)
-                .Select(Something.DoSomething)
-                .ToArray();
+            string executionContext1Text = result.ExecutionContext1?.ToString() ?? "<null>";
+            sb.AppendLine($"    - Execution context 1: {executionContext1Text}");
 
-            foreach (Task<Result> task in tasks)
-                await task;
-            //Task.WaitAll(tasks);
+            string executionContext2Text = result.ExecutionContext2?.ToString() ?? "<null>";
+            sb.AppendLine($"    - Execution context 2: {executionContext2Text}");
 
-            List<Result> results = tasks
-                .Select(x => x.Result)
-                .ToList();
+            sb.AppendLine($"    - Is same execution context: {result.IsSameExecutionContext}");
 
-            sb.AppendLine("Count: " + results.Count);
-            sb.AppendLine("Is same synchronization context: " + results.All(x => x.IsSameSynchronizationContext));
-            sb.AppendLine("Is same thread id: " + results.All(x => x.IsSameThreadId));
-            sb.AppendLine("Is same execution context: " + results.All(x => x.IsSameExecutionContext));
-            sb.AppendLine("Is same dispatcher: " + results.All(x => x.IsSameDispatcher));
+            string dispatcher1Text = result.Dispatcher1?.ToString() ?? "<null>";
+            sb.AppendLine($"    - Dispatcher 1: {dispatcher1Text}");
 
-            TextBoxResults.Text += sb.ToString();
+            string dispatcher2Text = result.Dispatcher2?.ToString() ?? "<null>";
+            sb.AppendLine($"    - Dispatcher 2: {dispatcher2Text}");
+
+            sb.AppendLine($"    - Is same dispatcher: {result.IsSameDispatcher}");
+            
+            return sb.ToString();
+        }
+
+        private void DisplayResult(string result)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                TextBoxResults.Text = result;
+            });
         }
     }
 }

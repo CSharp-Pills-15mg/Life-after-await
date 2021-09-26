@@ -1,8 +1,8 @@
 using System.Threading;
 
-namespace NetFramework.WinForms
+namespace NetCore.WinForms
 {
-    public class Job
+    public class Result
     {
         private volatile SynchronizationContext synchronizationContext1;
         private volatile SynchronizationContext synchronizationContext2;
