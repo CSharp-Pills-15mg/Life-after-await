@@ -37,7 +37,7 @@ namespace NetFramework.WpfApplication
             // In order to execute correctly we need to restore the context after the await.
             // - Do not call ConfigureAwait(...) method. By default the await keyword will restore the context.
             // - Or call ConfigureAwait(true) to explicitly ask to restore the context.
-            await Task.Delay(1000).ConfigureAwait(true);
+            await Task.Delay(1000).ConfigureAwait(false);
 
             // After async
             result.SynchronizationContext2 = SynchronizationContext.Current;

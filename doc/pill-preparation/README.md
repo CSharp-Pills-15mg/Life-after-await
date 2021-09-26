@@ -1,37 +1,60 @@
-# Life after await
+# Life after `await`
 
-## What do I want to show?
+## Preparation Recipe
 
-### The type of the Synchronization Context in different types of applications:
+- Create an ASP.NET Web Application (Web API) with .NET Framework 4.8.
+- Create an asynchronous GET endpoint in the `ValuesController`.
+- First run:
+  - Call an asynchronous method: `Task.Delay(1000)`;
+  - Before the asynchronous call, store, in a variable, the current `HttpContext`.
+  - After the asynchronous call, store, in another variable, the current `HttpContext`.
+  - Return, as response, the two instances of the `HttpContext`.
+  - Run the application and check the results.
 
-- Console (Net Core) - `null`
-- WinForms (Net Framework) - `WindowsFormsSynchronizationContext`
-- WPF (Net Core) - `DispatcherSynchronizationContext`
-- ASP.NET (Net Framework) - `AspNetSynchronizationContext`
-- ASP.NET (Net Core) - `null`
+```csharp
+public async Task<Result> Get()
+{
+    HttpContext httpContext1 = HttpContext.Current;
+    await Task.Delay(1000);
+    HttpContext httpContext2 = HttpContext.Current;
 
-### If context is NOT preserved `ConfigureAwait(false)`:
+    return new ResultViewModel
+    {
+        HttpContext1 = httpContext1?.GetType().FullName,
+        HttpContext2 = httpContext2?.GetType().FullName
+    };
+}
+```
 
-- Console (Net Core) - no effect
-- WPF (Net Core) - different `Dispatcher` instance
-- Web Application (Net Framework) - loose `HttpContext`
-- Web Application (Net Core) - no effect
+- Second run - with `ConfigureAwait(false)`
+  - Add `ConfigureAwait(false)` to the asynchronous call.
+  - Run the application again.
 
-## Preparation Recipe (must redo)
+```csharp
+public async Task<Result> Get()
+{
+    // ...
 
-- Create a C# Console Application.
-- Create an `async` method, and `await` inside it another `async` method.
-- Before the call, write into the console the id of the current thread.
-- After the call, write into the console the id of the current thread.
-- Build in release mode and run the application from outside Visual Studio.
-- Repeat the test using `ConfigureAwait` when awaiting the second method.
+    await Task.Delay(1000).ConfigureAwait(false);
 
+    // ...
+}
+```
 
+- Third run - with `ConfigureAwait(true)`
+  - Add `ConfigureAwait(true)` to the asynchronous call.
+  - Run the application again.
 
-- asp.net core app
-- change current culture
-- call an async operation with `ConfigureAwait(true)`
-- check the current culture and `HttpContext.Current`
-- call an async operation with `ConfigureAwait(false)`
-- check the current culture and `HttpContext.Current` again.
+```csharp
+public async Task<Result> Get()
+{
+    // ...
+
+    await Task.Delay(1000).ConfigureAwait(true);
+
+    // ...
+}
+```
+
+- Talk about the `SynchronizationContext` and show the table with different types of synchronization contexts for each type of application.
 

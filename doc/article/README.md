@@ -80,34 +80,11 @@ Stephen Cleary has a good article posted on the Microsoft's web page:
 
 ### What does the Synchronization Context preserve?
 
-WinForms context (`WindowsFormsSynchronizationContext`):
-
-- the UI thread
-
-WPF context (`DispatcherSynchronizationContext`):
-
-- the UI thread
-- the Dispatcher
-
-Default - Thread Pool (`SynchronizationContext`):
-
-- nothing
-
-ASP.NET context (`AspNetSynchronizationContext`):
-
-- the `HttpContext.Current`
-- NOT the same thread.
-
-ASP.NET Core context:
-
--  There is none.
-
-## If context is not preserved: `ConfigureAwait(false)`
-
-|                 |    NET Framework    |               NET Core               |
-| --------------- | :-----------------: | :----------------------------------: |
-| Console         |     (no effect)     |             (no effect)              |
-| WinForms        |          ?          |                                      |
-| WPF             |          ?          | different `Dispatcher` - still works |
-| Web Application | loose `HttpContext` |             (no effect)              |
+|                       |      NET Framework       |         NET Core         |
+| --------------------- | :----------------------: | :----------------------: |
+| Console               |        (nothing)         |        (nothing)         |
+| WinForms              |        UI thread         |        UI thread         |
+| WPF                   | UI thread and Dispatcher | UI thread and Dispatcher |
+| ASP.NET               |      `HttpContext`       |        (nothing)         |
+| Default - Thread Pool |        (nothing)         |        (nothing)         |
 
