@@ -1,4 +1,4 @@
-# Life after await
+# Life after `await`
 
 ## Pill Category
 
@@ -6,7 +6,7 @@ Frameworks (.NET)
 
 ## Description
 
-Let's have, for example, a call to an asynchronous method that we await. To do so, our main method must also be asynchronous:
+Let's consider, for example, a call to an asynchronous method that we await. To do so, our caller method must also be asynchronous:
 
 ```csharp
 private async Task DoSomething()

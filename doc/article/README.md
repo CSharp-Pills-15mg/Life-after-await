@@ -2,9 +2,9 @@
 
 ## What is context?
 
-For different types of applications, context means different things: same thread, same `HttpContext`, same `Dispatcher` or something else.
+For different types of applications, context means different things. For example, it may be the same thread, the same `HttpContext`, the same `Dispatcher` or something else.
 
-A `SynchronizationContext` instance can be used to encapsulate the details of what context means and help to execute a peace of code in that context.
+A `SynchronizationContext` instance is a generic concept that can be used to encapsulate the details of what context means and helps to execute code in that context. Each type of application will provide a custom synchronization context.
 
 ## When do we need context?
 
