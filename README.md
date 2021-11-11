@@ -25,3 +25,9 @@ private async Task DoSomething()
 
 - What happens with the execution when it returns from an awaited call? Is the code after the `await` executed by the same thread? Do we have a way to control this behaviour?
 
+## Donations
+
+> If you like my work and want to support me, you can buy me a coffee:
+>
+> [![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Y8Y62EZ8H)
+
